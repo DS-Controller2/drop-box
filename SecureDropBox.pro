@@ -9,7 +9,7 @@ CONFIG += c++17
 TARGET = SecureDropBox
 
 # Directories
-INCLUDEPATH += include/ src/ /usr/include
+INCLUDEPATH += include/ src/
 
 # Headers
 HEADERS += \
@@ -41,10 +41,14 @@ SOURCES += \
     src/Utils.cpp
 
 # Libraries
-LIBS += -L/usr/lib64 -lcppcrypto -lsodium -lz
+LIBS += -lsodium -lz
 
 # Build directories
 MOC_DIR = build/moc
 OBJECTS_DIR = build/obj
 RCC_DIR = build/rcc
 UI_DIR = build/ui
+
+linux-g++ {
+    message("Configuring for Linux with GCC")
+}

@@ -1,3 +1,7 @@
+#ifndef __linux__
+#warning "This project is primarily developed and tested on Linux. Other platforms are not officially supported."
+#endif
+
 #include <QApplication>
 #include <QMainWindow>
 #include <QLabel>

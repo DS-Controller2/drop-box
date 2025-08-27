@@ -100,31 +100,15 @@ std::vector<unsigned char> EncryptionManager::decrypt(const std::vector<unsigned
 }
 
 std::vector<unsigned char> EncryptionManager::deriveKey(const std::string& passphrase, const std::string& salt, uint32_t derived_key_len) {
-    // Argon2 parameters (recommended values or adjusted based on security needs)
-    // Using argon2id as it's generally recommended for password hashing.
-    uint32_t parallelism_degree = 4;
-    uint32_t memory_cost = 4096; // 4 MB
-    uint32_t time_cost = 3;      // 3 iterations
-
     std::vector<unsigned char> derived_key(derived_key_len);
-
-    try {
-        cppcrypto::argon2 argon2_kdf(
-            cppcrypto::argon2::type::argon2id, // Using argon2id
-            parallelism_degree,
-            memory_cost,
-            time_cost
-        );
-
-        argon2_kdf.derive_key(
-            passphrase.c_str(), passphrase.length(),
-            (const unsigned char*)salt.c_str(), salt.length(),
-            derived_key.data(), derived_key.size()
-        );
-    } catch (const std::exception& e) {
-        std::cerr << "Error deriving key with Argon2: " << e.what() << std::endl;
-        return {}; // Return empty vector on error
+    if (crypto_pwhash(derived_key.data(), derived_key.size(),
+                     passphrase.c_str(), passphrase.length(),
+                     (const unsigned char*)salt.c_str(),
+                     crypto_pwhash_OPSLIMIT_INTERACTIVE,
+                     crypto_pwhash_MEMLIMIT_INTERACTIVE,
+                     crypto_pwhash_ALG_DEFAULT) != 0) {
+        std::cerr << "Error deriving key with Argon2." << std::endl;
+        return {};
     }
-
     return derived_key;
 }
