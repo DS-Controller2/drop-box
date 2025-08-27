@@ -1,0 +1,47 @@
+# CMake build directory
+build/
+
+# Compiled files
+*.o
+*.so
+*.dll
+*.dylib
+*.a
+
+# Executables
+*.exe
+drop-box
+drop-box-core
+tests/drop-box-tests
+tests/encryption_manager_tests
+
+# Dependency directories (FetchContent, etc.)
+_deps/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*~
+
+# Log files
+*.log
+
+# Test results
+test_results/
+
+# Compressed files
+*.zlib
+*.bin
+*.comp.txt
+*.txt
+
+# Other generated files
+cmake_install.cmake
+CMakeCache.txt
+CTestTestfile.cmake
+Makefile
+CMakeFiles/
+drop-box_autogen/
+drop-box-core_autogen/
+include/moc_FileMonitor.cpp_parameters

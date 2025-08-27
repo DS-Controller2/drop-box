@@ -1,3 +1,0 @@
-repository='external project URL'
-module='https://sourceforge.net/projects/cppcrypto/files/cppcrypto-0.20-src.zip/download'
-tag=''
