@@ -45,3 +45,9 @@ CMakeFiles/
 drop-box_autogen/
 drop-box-core_autogen/
 include/moc_FileMonitor.cpp_parameters
+
+# qmake generated files
+SecureDropBox
+*.moc
+.qmake.stash
+build/

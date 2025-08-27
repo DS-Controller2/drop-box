@@ -9,7 +9,7 @@ CONFIG += c++17
 TARGET = SecureDropBox
 
 # Directories
-INCLUDEPATH += include/ src/ /usr/include
+INCLUDEPATH += include/ src/
 
 # Headers
 HEADERS += \
@@ -41,7 +41,7 @@ SOURCES += \
     src/Utils.cpp
 
 # Libraries
-LIBS += -L/usr/lib64 -lcppcrypto -lsodium -lz
+LIBS += -lsodium -lz
 
 # Build directories
 MOC_DIR = build/moc

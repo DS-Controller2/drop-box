@@ -3,8 +3,6 @@
 
 #include <string>
 #include <vector>
-#include <cppcrypto/argon2.h> // For Argon2 KDF
-
 // Use extern "C" for C library headers in C++
 #ifdef __cplusplus
 extern "C" {
