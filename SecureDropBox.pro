@@ -48,3 +48,7 @@ MOC_DIR = build/moc
 OBJECTS_DIR = build/obj
 RCC_DIR = build/rcc
 UI_DIR = build/ui
+
+linux-g++ {
+    message("Configuring for Linux with GCC")
+}

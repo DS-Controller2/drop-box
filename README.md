@@ -2,6 +2,8 @@
 
 This is a secure file storage application built with Qt.
 
+**Note:** This project is primarily developed and tested on Linux. Other platforms are not officially supported.
+
 ## Build Instructions
 
 ### Prerequisites
