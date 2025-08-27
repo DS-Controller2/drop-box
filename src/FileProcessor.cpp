@@ -4,46 +4,6 @@
 #include <QFile>
 #include <fstream>
 
-#define CHUNK_SIZE 4096 // Define a chunk size for file I/O (e.g., 4KB)
-
-// Helper function to read file content into a vector<unsigned char>
-std::vector<unsigned char> readFileContent(const std::string& filePath) {
-    std::ifstream file(filePath, std::ios::binary);
-    if (!file.is_open()) {
-        qWarning() << "Error: Could not open file for reading:" << QString::fromStdString(filePath);
-        return {};
-    }
-
-    std::vector<unsigned char> buffer;
-    char chunk[CHUNK_SIZE];
-    while (file.read(chunk, sizeof(chunk))) {
-        buffer.insert(buffer.end(), chunk, chunk + sizeof(chunk));
-    }
-    buffer.insert(buffer.end(), chunk, chunk + file.gcount());
-
-    return buffer;
-}
-
-// Helper function to write vector<unsigned char> content to a file
-bool writeFileContent(const std::string& filePath, const std::vector<unsigned char>& content) {
-    std::ofstream file(filePath, std::ios::binary);
-    if (!file.is_open()) {
-        qWarning() << "Error: Could not open file for writing:" << QString::fromStdString(filePath);
-        return false;
-    }
-
-    size_t totalWritten = 0;
-    while (totalWritten < content.size()) {
-        size_t bytesToWrite = std::min((size_t)CHUNK_SIZE, content.size() - totalWritten);
-        if (!file.write(reinterpret_cast<const char*>(content.data() + totalWritten), bytesToWrite)) {
-            qWarning() << "Error: Could not write file content:" << QString::fromStdString(filePath);
-            return false;
-        }
-        totalWritten += bytesToWrite;
-    }
-    return true;
-}
-
 FileProcessor::FileProcessor(FileSystemManager *fsManager, EncryptionManager *encManager, CompressionManager *compManager, ExclusionManager *exclusionManager, MetadataManager *metadataManager, QObject *parent)
     : QObject(parent),
       fsManager(fsManager),
@@ -79,7 +39,7 @@ void FileProcessor::processFile(const QString &filePath)
     }
 
     // 2. Read file content
-    std::vector<unsigned char> inputContent = readFileContent(filePath.toStdString());
+    std::vector<unsigned char> inputContent = Utils::readFileContent(filePath.toStdString());
     if (inputContent.empty()) {
         emit errorOccurred(QString("Error reading input file for processing: %1").arg(filePath));
         return;
@@ -91,7 +51,12 @@ void FileProcessor::processFile(const QString &filePath)
     std::vector<unsigned char> key(crypto_secretbox_KEYBYTES);
     std::copy(fixedKey.begin(), fixedKey.begin() + crypto_secretbox_KEYBYTES, key.begin());
 
-    std::vector<unsigned char> encryptedContent = encManager->encrypt(inputContent, key);
+    // For simplicity, using a fixed HMAC key. In a real app, this would be managed securely.
+    std::string fixedHmacKey = "thisisalongandsecurehmackeyforthisapp";
+    std::vector<unsigned char> hmac_key(EncryptionManager::HMAC_KEY_SIZE);
+    std::copy(fixedHmacKey.begin(), fixedHmacKey.begin() + EncryptionManager::HMAC_KEY_SIZE, hmac_key.begin());
+
+    std::vector<unsigned char> encryptedContent = encManager->encrypt(inputContent, key, hmac_key);
     if (encryptedContent.empty()) {
         emit errorOccurred("Encryption failed for " + filePath);
         return;
@@ -123,7 +88,7 @@ void FileProcessor::processFile(const QString &filePath)
     QString destinationPath = destinationFolder + QDir::separator() + newFileName;
 
     // Write the processed content to the new file
-    if (writeFileContent(destinationPath.toStdString(), compressedContent)) {
+    if (Utils::writeFileContent(destinationPath.toStdString(), compressedContent)) {
         emit fileProcessed(QString("Successfully processed and moved %1 to %2").arg(filePath).arg(destinationPath));
         // Remove original file after successful processing
         QFile::remove(filePath);

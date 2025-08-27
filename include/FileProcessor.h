@@ -15,12 +15,7 @@
 #include "CompressionManager.h"
 #include "ExclusionManager.h"
 #include "MetadataManager.h"
-
-// Helper function to read file content into a vector<unsigned char>
-std::vector<unsigned char> readFileContent(const std::string& filePath);
-
-// Helper function to write vector<unsigned char> content to a file
-bool writeFileContent(const std::string& filePath, const std::vector<unsigned char>& content);
+#include "Utils.h"
 
 class FileProcessor : public QObject
 {
