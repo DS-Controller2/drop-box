@@ -1,0 +1,5 @@
+if(EXISTS "/home/dondre/Run/drop-box/build/tests/encryption_manager_tests[1]_tests.cmake")
+  include("/home/dondre/Run/drop-box/build/tests/encryption_manager_tests[1]_tests.cmake")
+else()
+  add_test(encryption_manager_tests_NOT_BUILT encryption_manager_tests_NOT_BUILT)
+endif()

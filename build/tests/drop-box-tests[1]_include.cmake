@@ -1,0 +1,5 @@
+if(EXISTS "/home/dondre/Run/drop-box/build/tests/drop-box-tests[1]_tests.cmake")
+  include("/home/dondre/Run/drop-box/build/tests/drop-box-tests[1]_tests.cmake")
+else()
+  add_test(drop-box-tests_NOT_BUILT drop-box-tests_NOT_BUILT)
+endif()
