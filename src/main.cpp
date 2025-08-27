@@ -22,48 +22,9 @@
 #include "SettingsDialog.h" // Include the new settings dialog header
 #include "FileMonitor.h" // Include the new file monitor header
 #include "MetadataManager.h" // Include the new metadata manager header
-
-#define CHUNK_SIZE 4096 // Define a chunk size for file I/O (e.g., 4KB)
+#include "Utils.h"
 
 namespace fs = std::filesystem;
-
-// Helper function to read file content into a vector<unsigned char>
-std::vector<unsigned char> readFileContent(const std::string& filePath) {
-    std::ifstream file(filePath, std::ios::binary);
-    if (!file.is_open()) {
-        std::cerr << "Error: Could not open file for reading: " << filePath << std::endl;
-        return {};
-    }
-
-    std::vector<unsigned char> buffer;
-    char chunk[CHUNK_SIZE];
-    while (file.read(chunk, sizeof(chunk))) {
-        buffer.insert(buffer.end(), chunk, chunk + sizeof(chunk));
-    }
-    buffer.insert(buffer.end(), chunk, chunk + file.gcount());
-
-    return buffer;
-}
-
-// Helper function to write vector<unsigned char> content to a file
-bool writeFileContent(const std::string& filePath, const std::vector<unsigned char>& content) {
-    std::ofstream file(filePath, std::ios::binary);
-    if (!file.is_open()) {
-        std::cerr << "Error: Could not open file for writing: " << filePath << std::endl;
-        return false;
-    }
-
-    size_t totalWritten = 0;
-    while (totalWritten < content.size()) {
-        size_t bytesToWrite = std::min((size_t)CHUNK_SIZE, content.size() - totalWritten);
-        if (!file.write(reinterpret_cast<const char*>(content.data() + totalWritten), bytesToWrite)) {
-            std::cerr << "Error: Could not write file content: " << filePath << std::endl;
-            return false;
-        }
-        totalWritten += bytesToWrite;
-    }
-    return true;
-}
 
 class DropBoxMainWindow : public QMainWindow {
     Q_OBJECT
@@ -297,7 +258,7 @@ public:
                 return;
             }
 
-            std::vector<unsigned char> inputContent = readFileContent(inputFile);
+            std::vector<unsigned char> inputContent = Utils::readFileContent(inputFile);
             if (inputContent.empty()) {
                 feedbackTextEdit->append(QString("Error reading input file: %1").arg(QString::fromStdString(inputFile)));
                 return;
@@ -317,7 +278,7 @@ public:
                 return;
             }
 
-            if (writeFileContent(outputFile, decryptedContent)) {
+            if (Utils::writeFileContent(outputFile, decryptedContent)) {
                 feedbackTextEdit->append(QString("Successfully decrypted %1 to %2").arg(QString::fromStdString(inputFile)).arg(QString::fromStdString(outputFile)));
             } else {
                 feedbackTextEdit->append(QString("Error writing output file: %1").arg(QString::fromStdString(outputFile)));
@@ -348,7 +309,7 @@ public:
                 return;
             }
 
-            std::vector<unsigned char> inputContent = readFileContent(inputFile);
+            std::vector<unsigned char> inputContent = Utils::readFileContent(inputFile);
             if (inputContent.empty()) {
                 feedbackTextEdit->append(QString("Error reading input file: %1").arg(QString::fromStdString(inputFile)));
                 return;
@@ -361,7 +322,7 @@ public:
                     return;
                 }
 
-                if (writeFileContent(outputFile, compressedContent)) {
+                if (Utils::writeFileContent(outputFile, compressedContent)) {
                     feedbackTextEdit->append(QString("Successfully compressed %1 to %2").arg(QString::fromStdString(inputFile)).arg(QString::fromStdString(outputFile)));
                 } else {
                     feedbackTextEdit->append(QString("Error writing output file: %1").arg(QString::fromStdString(outputFile)));
@@ -380,7 +341,7 @@ public:
                 return;
             }
 
-            std::vector<unsigned char> inputContent = readFileContent(inputFile);
+            std::vector<unsigned char> inputContent = Utils::readFileContent(inputFile);
             if (inputContent.empty()) {
                 feedbackTextEdit->append(QString("Error reading input file: %1").arg(QString::fromStdString(inputFile)));
                 return;
@@ -393,7 +354,7 @@ public:
                     return;
                 }
 
-                if (writeFileContent(outputFile, decompressedContent)) {
+                if (Utils::writeFileContent(outputFile, decompressedContent)) {
                     feedbackTextEdit->append(QString("Successfully decompressed %1 to %2").arg(QString::fromStdString(inputFile)).arg(QString::fromStdString(outputFile)));
                 } else {
                     feedbackTextEdit->append(QString("Error writing output file: %1").arg(QString::fromStdString(outputFile)));
@@ -445,7 +406,7 @@ void DropBoxMainWindow::processMonitoredFile(const QString &filePath)
     }
 
     // 2. Read file content
-    std::vector<unsigned char> inputContent = readFileContent(filePath.toStdString());
+    std::vector<unsigned char> inputContent = Utils::readFileContent(filePath.toStdString());
     if (inputContent.empty()) {
         feedbackTextEdit->append(QString("Error reading input file for processing: %1").arg(filePath));
         return;
@@ -494,7 +455,7 @@ void DropBoxMainWindow::processMonitoredFile(const QString &filePath)
     QString destinationPath = destinationFolder + QDir::separator() + newFileName;
 
     // Write the processed content to the new file
-    if (writeFileContent(destinationPath.toStdString(), compressedContent)) {
+    if (Utils::writeFileContent(destinationPath.toStdString(), compressedContent)) {
         feedbackTextEdit->append(QString("Successfully processed and moved %1 to %2").arg(filePath).arg(destinationPath));
         // Remove original file after successful processing
         QFile::remove(filePath);
